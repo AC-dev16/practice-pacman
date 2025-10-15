@@ -1,0 +1,322 @@
+/* Import retro fonts */
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap");
+
+body {
+    background: url(../images/background.jpg) repeat center center fixed;
+    animation: scrollBg 60s linear infinite;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: "Orbitron", monospace;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.retro-title {
+    font-family: "Press Start 2P", monospace;
+    font-size: 3rem;
+    color: #ffee00;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 2rem;
+    text-shadow: 3px 3px 0px #ff6b35, 6px 6px 0px #000000, 0px 0px 15px #ffee00;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    from {
+        text-shadow: 3px 3px 0px #ff6b35, 6px 6px 0px #000000,
+            0px 0px 15px #ffee00, 0px 0px 25px #ffee00;
+    }
+    to {
+        text-shadow: 3px 3px 0px #ff6b35, 6px 6px 0px #000000,
+            0px 0px 25px #ffee00, 0px 0px 35px #ffee00, 0px 0px 50px #ffee00;
+    }
+}
+
+@keyframes scrollBg {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: -1000px 0;
+    }
+}
+
+.games-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.game-card {
+    flex: 1 1 300px; /* flexible width with 300px base */
+    max-width: 350px;
+    min-width: 280px;
+    background: #1a1a1a;
+    border: 3px dashed #7df9ff;
+    border-radius: 10px;
+    padding: 1rem;
+    min-height: 360px;
+    transition: transform 0.3s;
+    cursor: pointer;
+    color: #a786df;
+}
+
+.game-card h2 {
+    font-family: "Press Start 2P", monospace;
+    font-size: 1.2rem;
+    color: #ffee00;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0.8rem 0 0 0;
+    text-shadow: 2px 2px 0px #ff6b35, 4px 4px 0px #000000, 0px 0px 10px #ffee00;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 2px 2px 0px #ff6b35, 4px 4px 0px #000000,
+            0px 0px 10px #ffee00, 0px 0px 20px #ffee00;
+    }
+    to {
+        text-shadow: 2px 2px 0px #ff6b35, 4px 4px 0px #000000,
+            0px 0px 20px #ffee00, 0px 0px 30px #ffee00, 0px 0px 40px #ffee00;
+    }
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    border-color: #ff6b35;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5),
+        0px 0px 20px rgba(255, 238, 0, 0.3);
+}
+
+.game-card:hover h2 {
+    color: #ff6b35;
+    animation-duration: 0.5s;
+}
+
+.game-card .game-image {
+    display: block;
+    width: 100%;
+    height: 220px;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Music button styling - positioned in top right corner */
+#music-toggle {
+    display: block;
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 50;
+    padding: 0;
+    background: transparent;
+    border: 3px solid #ffee00;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    width: 60px;
+    height: 60px;
+    overflow: hidden;
+}
+
+#music-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    border-color: #7df9ff;
+}
+
+.music-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.music-label {
+    display: none;
+}
+
+/* Force centering for main page container and game cards */
+.page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+}
+
+/* Responsive adjustments for different screen sizes */
+
+/* Large screens (1200px and up) */
+@media (min-width: 1200px) {
+    .games-section {
+        padding: 3rem;
+        gap: 2.5rem;
+    }
+
+    .game-card {
+        max-width: 380px;
+        min-height: 400px;
+    }
+
+    .game-card .game-image {
+        height: 250px;
+    }
+}
+
+/* Medium screens (768px to 1199px) - Tablets */
+@media (max-width: 1199px) and (min-width: 768px) {
+    .retro-title {
+        font-size: 2.5rem;
+        letter-spacing: 3px;
+        margin-bottom: 1.5rem;
+    }
+
+    .games-section {
+        gap: 1.5rem;
+        max-width: 900px;
+    }
+
+    .game-card {
+        flex: 1 1 280px;
+        max-width: 320px;
+        min-width: 260px;
+        min-height: 340px;
+    }
+
+    .game-card .game-image {
+        height: 200px;
+    }
+}
+
+/* Small tablets and large phones (481px to 767px) */
+@media (max-width: 767px) and (min-width: 481px) {
+    .retro-title {
+        font-size: 2rem;
+        letter-spacing: 2px;
+        margin-bottom: 1.2rem;
+    }
+
+    .games-section {
+        gap: 1.2rem;
+    }
+
+    .game-card {
+        flex: 1 1 220px;
+        max-width: 240px;
+        min-width: 200px;
+        min-height: 280px;
+        padding: 0.8rem;
+    }
+
+    .game-card .game-image {
+        height: 150px;
+    }
+
+    #music-toggle {
+        width: 55px;
+        height: 55px;
+    }
+}
+
+/* Mobile phones (480px and below) */
+@media (max-width: 480px) {
+    .retro-title {
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+    }
+
+    .games-section {
+        gap: 0.8rem;
+    }
+
+    .game-card {
+        flex: 1 1 180px;
+        max-width: 200px;
+        min-width: 160px;
+        min-height: 240px;
+        padding: 0.6rem;
+    }
+
+    .game-card .game-image {
+        height: 120px;
+    }
+
+    .game-card h2 {
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+    }
+
+    /* Smaller music button on mobile */
+    #music-toggle {
+        top: 1rem;
+        right: 1rem;
+        width: 48px;
+        height: 48px;
+    }
+}
+
+/* Extra small phones (360px and below) */
+@media (max-width: 360px) {
+    .retro-title {
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+        margin-bottom: 0.8rem;
+    }
+
+    .page-container {
+        padding: 1rem 0;
+    }
+
+    .games-section {
+        gap: 0.6rem;
+    }
+
+    .game-card {
+        flex: 1 1 140px;
+        max-width: 160px;
+        min-width: 130px;
+        min-height: 200px;
+        padding: 0.5rem;
+    }
+
+    .game-card .game-image {
+        height: 100px;
+    }
+
+    .game-card h2 {
+        font-size: 0.7rem;
+        margin: 0.5rem 0 0 0;
+        letter-spacing: 0.5px;
+    }
+
+    #music-toggle {
+        width: 40px;
+        height: 40px;
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+}

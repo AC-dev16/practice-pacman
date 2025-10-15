@@ -1,0 +1,10 @@
+/* Responsive canvas for Pacman game */
+#pacman-canvas {
+    aspect-ratio: 1 / 1;
+    background: #222;
+    border: 4px solid #7df9ff;
+    border-radius: 12px;
+    box-shadow: 0 0 24px #7df9ff44;
+    display: block;
+    margin: 0 auto;
+}
