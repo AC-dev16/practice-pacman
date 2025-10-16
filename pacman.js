@@ -1,5 +1,6 @@
 const canvas = document.getElementById("pacman-canvas");
 const ctx = canvas.getContext("2d");
+const scoreEl = document.getElementById("scoreEl");
 
 const blockSize = 30;
 const rowCount = 20;
@@ -102,6 +103,7 @@ const keys = {
 };
 
 let lastKey = '';
+let score = 0;
 
 // Create the map using a 2D array
 const map = [
@@ -213,12 +215,15 @@ function animate() {
 
     // Draw and handle pellets
     // Using a for loop instead of forEach so we can splice (remove) pellets when eaten without rendering issues/ flickering - going backwards through array so splicing doesn't affect the indexes of pellets yet to be checked
+    // Touch pellets here
     for (let i = pellets.length - 1; 0 < i; i--) {
         const pellet = pellets[i];
         pellet.draw();
         if (Math.hypot(pellet.position.x - player.position.x, pellet.position.y - player.position.y) < pellet.radius + player.radius) {
             // console.log('pellet eaten');
             pellets.splice(i, 1);
+            score += 10;
+            scoreEl.innerHTML = score;
         }
     }
 
