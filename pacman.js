@@ -131,26 +131,76 @@ map.forEach((row, i) => {
     });
 
 
+function circleCollidesWithRectangle({circle, rectangle}) {
+    return (circle.position.y - circle.radius + circle.velocity.y <= rectangle.position.y + rectangle.height && circle.position.x + circle.radius + circle.velocity.x >= rectangle.position.x && circle.position.y + circle.radius + circle.velocity.y >= rectangle.position.y && circle.position.x - circle.radius + circle.velocity.x <= rectangle.position.x + rectangle.width);
+}
+
 function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Gets rid of the trail effect
+     // Handle player movement based on key presses
+    if (keys.w.pressed && lastKey === 'w') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i];
+            // Check for collision with each boundary
+            if (circleCollidesWithRectangle({circle: {...player, velocity: {x: 0, y: -5}}, rectangle: boundary})) {
+                player.velocity.y = 0;
+                break;
+            } else {
+                player.velocity.y = -5;
+        }
+        }
+   
+    } else if (keys.a.pressed && lastKey === 'a') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i];
+            // Check for collision with each boundary
+            if (circleCollidesWithRectangle({circle: {...player, velocity: {x: -5, y: 0}}, rectangle: boundary})) {
+                player.velocity.x = 0;
+                break;
+            } else {
+                player.velocity.x = -5;
+        }
+        }
+    } else if (keys.s.pressed && lastKey === 's') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i];
+            // Check for collision with each boundary
+            if (circleCollidesWithRectangle({circle: {...player, velocity: {x: 0, y: 5}}, rectangle: boundary})) {
+                player.velocity.y = 0;
+                break;
+            } else {
+                player.velocity.y = 5;
+        }
+        }
+    } else if (keys.d.pressed && lastKey === 'd') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i];
+            // Check for collision with each boundary
+            if (circleCollidesWithRectangle({circle: {...player, velocity: {x: 5, y: 0}}, rectangle: boundary})) {
+                player.velocity.x = 0;
+                break;
+            } else {
+                player.velocity.x = 5;
+        }
+        }
+    }
+    
     boundaries.forEach(boundary => {
         boundary.draw();
+        // Collision detection between player and boundaries - order: top, right, bottom, left
+        // + player.velocity.y/x to check where the player is going to be, not where it currently is - stops sticking to walls
+        if (circleCollidesWithRectangle({circle: player, rectangle: boundary})) {
+            player.velocity.y = 0;
+            player.velocity.x = 0;
+        }
     });
-    player.update();
-    player.velocity.x = 0;
-    player.velocity.y = 0;
 
-    // Handle player movement based on key presses
-    if (keys.w.pressed && lastKey === 'w') {
-        player.velocity.y = -2;
-    } else if (keys.a.pressed && lastKey === 'a') {
-        player.velocity.x = -2;
-    } else if (keys.s.pressed && lastKey === 's') {
-        player.velocity.y = 2;
-    } else if (keys.d.pressed && lastKey === 'd') {
-        player.velocity.x = 2;
-    }
+    player.update();
+    // player.velocity.x = 0;
+    // player.velocity.y = 0;
+
+   
 };
 
 animate();
