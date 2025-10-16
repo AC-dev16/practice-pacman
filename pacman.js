@@ -210,11 +210,17 @@ function animate() {
         }
         }
     }
-    
-    pellets.forEach(pellet => {
+
+    // Draw and handle pellets
+    // Using a for loop instead of forEach so we can splice (remove) pellets when eaten without rendering issues/ flickering - going backwards through array so splicing doesn't affect the indexes of pellets yet to be checked
+    for (let i = pellets.length - 1; 0 < i; i--) {
+        const pellet = pellets[i];
         pellet.draw();
-        
-    });
+        if (Math.hypot(pellet.position.x - player.position.x, pellet.position.y - player.position.y) < pellet.radius + player.radius) {
+            // console.log('pellet eaten');
+            pellets.splice(i, 1);
+        }
+    }
 
     boundaries.forEach(boundary => {
         boundary.draw();
