@@ -10,7 +10,7 @@ canvas.width = blockSize * colCount;
 canvas.height = blockSize * rowCount;
 canvas.style.backgroundColor = "black";
 
-// Set up Boundary class for walls  - argument is an object so you dont have to remember order of params
+// Set up Boundary class for walls  - constructor argument is an object so you dont have to remember order of params
 class Boundary {
     static width = blockSize;
     static height = blockSize;
@@ -67,12 +67,14 @@ class Ghost {
         this.color = color;
         this.prevCollisions = [];
         this.speed = 2;
+        this.scared = false;
     }
 
     draw() {
-        ctx.fillStyle = this.color;
+        
         ctx.beginPath();
         ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);// Math.PI * 2 creates a full circle
+        ctx.fillStyle = this.scared ? "blue" : this.color;// changes ghost color when scared
         ctx.fill();
         ctx.closePath();
     }
@@ -99,8 +101,25 @@ class Pellet {
     }
 };
 
+class PowerUp {
+    constructor({position}) {
+        this.position = position;
+        this.radius = 7;
+    }
+
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);// Math.PI * 2 creates a full circle
+        ctx.fillStyle = "white";
+        ctx.fill();
+        ctx.closePath();
+    }
+};
+
+
 const pellets = [];
 const boundaries = [];
+const powerUps = [];
 const ghosts = [
     new Ghost({
         position: {
@@ -111,7 +130,29 @@ const ghosts = [
             x: Ghost.speed,
             y: 0
         }
-    })
+    }),
+    new Ghost({
+        position: {
+            x: Boundary.width * 15 + Boundary.width / 2,
+            y: Boundary.height * 10 + Boundary.height / 2
+        },
+        velocity: {
+            x: -Ghost.speed,
+            y: 0
+        },
+        color: "pink"
+    }),
+    new Ghost({
+        position: {
+            x: Boundary.width * 3 + Boundary.width / 2,
+            y: Boundary.height * 15 + Boundary.height / 2
+        },
+        velocity: {
+            x: 0,
+            y: -Ghost.speed
+        },
+        color: "cyan"
+    })  
 ];
 
 const player = new Player({
@@ -151,20 +192,20 @@ const map = [
     ['-', '.', '-', '-', '-', '-', '-', '-', '-', '.', '.', '-', '-', '-', '-', '-', '-', '-', '.', '-'],
     ['-', '.', '-', '.', '.', '.', '.', '.', '-', '-', '-', '-', '.', '.', '.', '.', '.', '-', '.', '-'],
     ['-', '.', '.', '.', '-', '.', '-', '.', '.', '.', '.', '.', '.', '-', '.', '-', '.', '.', '.', '-'],
-    ['-', '-', '-', '.', '-', '.', '-', '.', '-', '.', '.', '-', '.', '-', '.', '-', '.', '-', '-', '-'],
+    ['-', '-', '-', '.', '-', '.', '-', '.', '-', '.', '.', '-', '.', '-', 'p', '-', '.', '-', '-', '-'],
     ['-', '-', '-', '.', '-', '.', '-', '.', '-', '.', '.', '-', '.', '-', '.', '-', '.', '-', '-', '-'],
     ['-', '.', '.', '.', '-', '.', '.', '.', '.', '-', '-', '.', '.', '.', '.', '-', '.', '.', '.', '-'],
     ['-', '.', '-', '-', '-', '-', '.', '-', '.', '.', '.', '.', '-', '.', '-', '-', '-', '-', '.', '-'],
     ['-', '.', '.', '.', '.', '.', '.', '-', '-', '-', '-', '-', '-', '.', '.', '.', '.', '.', '.', '-'],
     ['-', '-', '-', '.', '-', '-', '.', '.', '.', '.', '.', '.', '.', '.', '-', '-', '.', '-', '-', '-'],
     ['-', '-', '-', '.', '-', '-', '.', '-', '-', '-', '-', '-', '-', '.', '-', '-', '.', '-', '-', '-'],
-    ['-', '.', '.', '.', '.', '.', '.', '.', '.', '-', '-', '.', '.', '.', '.', '.', '.', '.', '.', '-'],
+    ['-', 'p', '.', '.', '.', '.', '.', '.', '.', '-', '-', '.', '.', '.', '.', '.', '.', '.', '.', '-'],
     ['-', '.', '-', '.', '-', '-', '-', '-', '.', '-', '-', '.', '-', '-', '-', '-', '.', '-', '.', '-'],
     ['-', '.', '.', '.', '-', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '-', '.', '.', '.', '-'],
     ['-', '-', '-', '.', '-', '.', '-', '-', '-', '-', '-', '-', '-', '-', '.', '-', '.', '-', '-', '-'],
     ['-', '.', '.', '.', '-', '.', '.', '.', '.', '-', '-', '.', '.', '.', '.', '-', '.', '.', '.', '-'],
     ['-', '.', '-', '-', '-', '-', '-', '-', '.', '-', '-', '.', '-', '-', '-', '-', '-', '-', '.', '-'],
-    ['-', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '-'],
+    ['-', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'p', '-'],
     ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
 ];
 
@@ -192,6 +233,16 @@ map.forEach((row, i) => {
                     })
                 );
                 break;
+            case 'p':
+                powerUps.push(
+                    new PowerUp({
+                        position: {
+                            x: j * Boundary.width + Boundary.width / 2,
+                            y: i * Boundary.height + Boundary.height / 2
+                        }
+                    })
+                );
+                break;
             }
         });
     });
@@ -202,8 +253,10 @@ function circleCollidesWithRectangle({circle, rectangle}) {
     return (circle.position.y - circle.radius + circle.velocity.y <= rectangle.position.y + rectangle.height + padding && circle.position.x + circle.radius + circle.velocity.x >= rectangle.position.x - padding && circle.position.y + circle.radius + circle.velocity.y >= rectangle.position.y - padding && circle.position.x - circle.radius + circle.velocity.x <= rectangle.position.x + rectangle.width + padding);
 }
 
+let animateId;
+
 function animate() {
-    requestAnimationFrame(animate);
+    animationId = requestAnimationFrame(animate);
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Gets rid of the trail effect
      // Handle player movement based on key presses
     if (keys.w.pressed && lastKey === 'w') {
@@ -254,6 +307,43 @@ function animate() {
         // Stop the player when no keys are pressed
         player.velocity.x = 0;
         player.velocity.y = 0;
+    }
+
+    // Detect collision between player and ghosts
+    for (let i = 0; i < ghosts.length; i++) {
+        const ghost = ghosts[i];
+        ghost.draw();
+        if (Math.hypot(ghost.position.x - player.position.x, ghost.position.y - player.position.y) < ghost.radius + player.radius) {
+            if (ghost.scared) {
+                ghosts.splice(i, 1);
+                score += 100;
+                scoreEl.innerHTML = score;
+            } else {
+                cancelAnimationFrame(animateId);
+                console.log('game over');
+            }
+        }
+    }
+
+    // Power-ups
+    for (let i = powerUps.length - 1; 0 <= i; i--) {
+        const powerUp = powerUps[i];
+        powerUp.draw();
+        // Detect collision between player and power-up
+        if (Math.hypot(powerUp.position.x - player.position.x, powerUp.position.y - player.position.y) < powerUp.radius + player.radius) {
+            // console.log('power-up eaten');
+            powerUps.splice(i, 1);
+            // make ghosts scared
+            ghosts.forEach(ghost => {
+                ghost.scared = true;
+                setTimeout(() => {
+                    ghost.scared = false;
+                }, 5000);// power-up lasts 5 seconds
+            });
+
+            // score += 50;
+            // scoreEl.innerHTML = score;
+        }
     }
 
     // Draw and handle pellets

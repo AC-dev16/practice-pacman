@@ -2,7 +2,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap");
 
 body {
-    background: url(../images/background.jpg) repeat center center fixed;
+    /* background: url(../images/background.jpg) repeat center center fixed; */
     animation: scrollBg 60s linear infinite;
     text-align: center;
     margin: 0;
