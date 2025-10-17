@@ -257,7 +257,7 @@ map.forEach((row, i) => {
 function circleCollidesWithRectangle({circle, rectangle}) {
     const padding = Boundary.width / 2 - circle.radius - 1;
     // + player.velocity.y/x to check where the player is going to be, not where it currently is - stops sticking to walls
-    return (circle.position.y - circle.radius + circle.velocity.y <= rectangle.position.y + rectangle.height && circle.position.x + circle.radius + circle.velocity.x >= rectangle.position.x && circle.position.y + circle.radius + circle.velocity.y >= rectangle.position.y && circle.position.x - circle.radius + circle.velocity.x <= rectangle.position.x + rectangle.width);
+    return (circle.position.y - circle.radius + circle.velocity.y <= rectangle.position.y + rectangle.height + padding && circle.position.x + circle.radius + circle.velocity.x >= rectangle.position.x - padding && circle.position.y + circle.radius + circle.velocity.y >= rectangle.position.y - padding && circle.position.x - circle.radius + circle.velocity.x <= rectangle.position.x + rectangle.width + padding);
 }
 
 let animateId;
@@ -431,15 +431,6 @@ function animate() {
             const pathways = ghost.prevCollisions.filter(collision => {
                 return !collisions.includes(collision);
             });
-            
-            // Add this check to prevent undefined direction
-            if (pathways.length === 0) {
-                // If no valid pathways, reverse direction
-                ghost.velocity.x = -ghost.velocity.x;
-                ghost.velocity.y = -ghost.velocity.y;
-                ghost.prevCollisions = [];
-                return;
-            }
             
             const direction = pathways[Math.floor(Math.random() * pathways.length)];
 
