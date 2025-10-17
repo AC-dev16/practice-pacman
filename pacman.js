@@ -139,7 +139,7 @@ const ghosts = [
     }),
     new Ghost({
         position: {
-            x: Boundary.width * 15 + Boundary.width / 2,
+            x: Boundary.width * 16 + Boundary.width / 2,
             y: Boundary.height * 10 + Boundary.height / 2
         },
         velocity: {
@@ -253,16 +253,17 @@ map.forEach((row, i) => {
         });
     });
 
-
+// Collision detection between player and boundaries - top, right, bottom, left
 function circleCollidesWithRectangle({circle, rectangle}) {
     const padding = Boundary.width / 2 - circle.radius - 1;
-    return (circle.position.y - circle.radius + circle.velocity.y <= rectangle.position.y + rectangle.height + padding && circle.position.x + circle.radius + circle.velocity.x >= rectangle.position.x - padding && circle.position.y + circle.radius + circle.velocity.y >= rectangle.position.y - padding && circle.position.x - circle.radius + circle.velocity.x <= rectangle.position.x + rectangle.width + padding);
+    // + player.velocity.y/x to check where the player is going to be, not where it currently is - stops sticking to walls
+    return (circle.position.y - circle.radius + circle.velocity.y <= rectangle.position.y + rectangle.height && circle.position.x + circle.radius + circle.velocity.x >= rectangle.position.x && circle.position.y + circle.radius + circle.velocity.y >= rectangle.position.y && circle.position.x - circle.radius + circle.velocity.x <= rectangle.position.x + rectangle.width);
 }
 
 let animateId;
 
 function animate() {
-    animationId = requestAnimationFrame(animate);
+    animateId = requestAnimationFrame(animate);
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Gets rid of the trail effect
      // Handle player movement based on key presses
     if (keys.w.pressed && lastKey === 'w') {
@@ -371,18 +372,18 @@ function animate() {
 
     boundaries.forEach(boundary => {
         boundary.draw();
-        // Collision detection between player and boundaries - order: top, right, bottom, left
-        // + player.velocity.y/x to check where the player is going to be, not where it currently is - stops sticking to walls
+        // Collision detection between player and boundaries 
         if (circleCollidesWithRectangle({circle: player, rectangle: boundary})) {
             player.velocity.y = 0;
             player.velocity.x = 0;
         }
     });
 
-    player.update();
+    player.update();// render player
     
+    // Ghost movement
     ghosts.forEach(ghost => {
-        ghost.update();
+        ghost.update();// render ghost
 
         const collisions = [];
         boundaries.forEach(boundary => {
@@ -417,17 +418,29 @@ function animate() {
         })
 
         // Changes ghost direction when it hits a wall
-        if (collisions.length > ghost.prevCollisions.length) ghost.prevCollisions = collisions
-
+        if (collisions.length > ghost.prevCollisions.length) {
+            ghost.prevCollisions = collisions;
+        }
+        // JSON stringify to compare arrays
         if(JSON.stringify(collisions) !== JSON.stringify(ghost.prevCollisions)) {
             if (ghost.velocity.x > 0) ghost.prevCollisions.push('right')
             else if (ghost.velocity.x < 0) ghost.prevCollisions.push('left')
             else if (ghost.velocity.y < 0) ghost.prevCollisions.push('up')
             else if (ghost.velocity.y > 0) ghost.prevCollisions.push('down')
 
-            const pathways = ghost.prevCollisions.filter((collision) => {
+            const pathways = ghost.prevCollisions.filter(collision => {
                 return !collisions.includes(collision);
             });
+            
+            // Add this check to prevent undefined direction
+            if (pathways.length === 0) {
+                // If no valid pathways, reverse direction
+                ghost.velocity.x = -ghost.velocity.x;
+                ghost.velocity.y = -ghost.velocity.y;
+                ghost.prevCollisions = [];
+                return;
+            }
+            
             const direction = pathways[Math.floor(Math.random() * pathways.length)];
 
             switch(direction) {
